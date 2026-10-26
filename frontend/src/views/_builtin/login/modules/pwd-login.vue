@@ -59,7 +59,6 @@ async function handleSubmit() {
     localStg.remove('rememberedLogin');
   }
 }
-
 </script>
 
 <template>
@@ -96,12 +95,7 @@ async function handleSubmit() {
         {{ $t(loginModuleRecord.register) }}
       </NButton>
 
-      <span class="text-center">
-        登录即代表已阅读并同意我们的
-        <NButton text type="primary">用户协议</NButton>
-        和
-        <NButton text type="primary">隐私政策</NButton>
-      </span>
+      <p class="text-muted text-center text-12px leading-6">请使用团队账号登录，资料可见范围以账号权限为准。</p>
     </div>
   </NForm>
 </template>

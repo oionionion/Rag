@@ -1,0 +1,44 @@
+{
+  "date": "2026-10-25",
+  "real": [
+    "desktop search modal has usable width",
+    "missing citation provides return action",
+    "mobile chat fits viewport",
+    "mobile document library fits viewport",
+    "mobile upload modal fits viewport",
+    "mobile search form fits viewport",
+    "dark mobile workspace fits viewport",
+    "/favicon.svg returns HTTP 200",
+    "/LICENSE returns HTTP 200"
+  ],
+  "simulated": [
+    "search loading message",
+    "search no-result guidance",
+    "search failure and retry action",
+    "search result includes source name and text",
+    "preview failure offers reload and close",
+    "preview retry renders text",
+    "citation renders evidence and original text",
+    "dark preview uses theme surface",
+    "organization loading failure disables upload",
+    "file selection enables upload without submitting",
+    "document list failure offers reload",
+    "uploaded and processing states are distinct"
+  ],
+  "pageErrors": [],
+  "screenshots": [
+    "docs/screenshots/docpilot-chat.png",
+    "docs/screenshots/docpilot-documents.png",
+    "docs/screenshots/docpilot-upload.png",
+    "docs/screenshots/docpilot-search.png",
+    "docs/screenshots/docpilot-search-results-simulated.png",
+    "docs/screenshots/docpilot-preview-simulated.png",
+    "docs/screenshots/docpilot-citation-simulated.png",
+    "docs/screenshots/docpilot-citation-dark-simulated.png",
+    "docs/screenshots/docpilot-processing-simulated.png",
+    "docs/screenshots/docpilot-chat-mobile.png",
+    "docs/screenshots/docpilot-upload-mobile.png",
+    "docs/screenshots/docpilot-chat-mobile-dark.png"
+  ],
+  "result": "all extended checks passed"
+}

@@ -1,10 +1,10 @@
 # AGENTS.md
 
-This file is the agent-facing working agreement for the `PaiSmart` repository.
+This file is the agent-facing working agreement for DocPilot (the existing `PaiSmart` repository).
 
 ## Purpose
 
-PaiSmart (派聪明) is an enterprise AI knowledge management system built around a RAG workflow:
+DocPilot — 团队知识库助手 is a team document search and question-answering application built on the PaiSmart RAG workflow:
 
 - Spring Boot backend
 - Vue 3 + TypeScript frontend
@@ -15,6 +15,15 @@ PaiSmart (派聪明) is an enterprise AI knowledge management system built aroun
 - MinIO for object storage
 
 Use this file as the first repo-local reference before making changes.
+
+## Product identity and compatibility
+
+- Public UI and current product docs use **DocPilot — 团队知识库助手**.
+- Preserve upstream author/license information and historical documents under `docs/history/`.
+- Keep Java packages, class names, database/schema names, API paths, environment keys, storage/cache prefixes, and existing deployment directories compatible.
+- Current local setup is documented in `本地运行说明.md`: isolated tools/services live under `/mnt/e/dev/PaiSmart`. Its launcher runs the packaged JAR, whereas an IDE-launched process may use hot reload. Inspect the actual runtime before deciding to compile or restart.
+- UI verification must separate real backend responses from explicitly simulated browser states, and must not invoke paid models without authorization.
+
 
 ## First Read
 

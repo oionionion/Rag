@@ -1,0 +1,61 @@
+{
+  "date": "2026-10-25",
+  "checks": [
+    "login identity and browser title",
+    "registration uses team invitation copy",
+    "real login and chat workspace",
+    "prompt card fills draft without sending",
+    "real empty document list",
+    "upload requires file and explains visibility",
+    "search initial state and empty-query guard"
+  ],
+  "consoleErrors": [],
+  "apiResponses": [
+    {
+      "path": "/proxy-default/users/login",
+      "status": 200
+    },
+    {
+      "path": "/proxy-default/users/me",
+      "status": 200
+    },
+    {
+      "path": "/proxy-default/users/me",
+      "status": 200
+    },
+    {
+      "path": "/proxy-default/users/conversations",
+      "status": 200
+    },
+    {
+      "path": "/proxy-default/users/conversation",
+      "status": 200
+    },
+    {
+      "path": "/proxy-default/chat/active-generation",
+      "status": 200
+    },
+    {
+      "path": "/proxy-default/users/me",
+      "status": 200
+    },
+    {
+      "path": "/proxy-default/documents/accessible",
+      "status": 200
+    },
+    {
+      "path": "/proxy-default/users/org-tags",
+      "status": 200
+    }
+  ],
+  "simulated": [],
+  "screenshots": [
+    "docs/screenshots/docpilot-login.png",
+    "docs/screenshots/docpilot-register.png",
+    "docs/screenshots/docpilot-chat.png",
+    "docs/screenshots/docpilot-documents.png",
+    "docs/screenshots/docpilot-upload.png",
+    "docs/screenshots/docpilot-search.png"
+  ],
+  "result": "initial browser checks complete"
+}

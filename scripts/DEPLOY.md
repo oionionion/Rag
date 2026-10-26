@@ -1,4 +1,6 @@
-# PaiSmart 发布
+# DocPilot 发布
+
+展示名称使用DocPilot；以下JAR名、存储目录与部署配置键保留已有兼容性。公开品牌调整不代表已经部署，本轮不执行远程发布。
 
 入口：`bash scripts/deploy-release.sh <action>`。默认 `DRY_RUN=1`，仅输出计划；不连接服务器，不写文件。
 
@@ -15,7 +17,7 @@
 示例（必须先检查目标构建）：
 
 ```bash
-export RELEASE_ID=1e36fa56-20260929-release1
+export RELEASE_ID=20261025-docpilot-01
 DRY_RUN=1 bash scripts/deploy-release.sh all
 DRY_RUN=0 bash scripts/deploy-release.sh prepare
 DRY_RUN=0 bash scripts/deploy-release.sh publish
@@ -31,6 +33,6 @@ DRY_RUN=0 bash scripts/deploy-release.sh publish
 
 脚本不删除历史备份、不覆盖线上 .env、不重建 ES 索引、不停止数据库等基础服务。前端旧目录保留为 `dist.prev.<RELEASE_ID>`，新 `dist` 指向本次静态资源目录。第一次从普通目录切换为符号链接涉及两次文件系统操作，存在极短窗口，不宣称零停机。
 
-切换和验收由独立远程进程负责，本地终端关闭后仍继续执行；出现切换/验收异常时自动回滚。断电、系统 OOM 或 worker 被强杀等无法被捕获的故障，需用同一 RELEASE_ID 检查状态并手动回滚。数据库升级应只含兼容旧代码的增量修改；本次为新增表/字段，仍需保留数据库备份。
+切换和验收由独立远程进程负责，本地终端关闭后仍继续执行；出现切换/验收异常时自动回滚。断电、系统 OOM 或 worker 被强杀等无法被捕获的故障，需用同一 RELEASE_ID 检查状态并手动回滚。本轮品牌与界面改造不涉及数据库结构变更；其他版本如需升级数据库，应保持旧代码兼容并保留备份。
 
 验证脚本：`python3 -m unittest discover -s scripts/tests -v`。

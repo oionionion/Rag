@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { inviteChannelConfig } from '@/constants/invite-channel';
 import { normalizeBackendMessage } from '@/service/request/shared';
 import { $t } from '@/locales';
 
@@ -45,7 +44,6 @@ const rules = computed<Record<keyof FormModel, App.Global.FormRule[]>>(() => {
 
 const loading = ref(false);
 const inviteCodeErrorMessage = ref('');
-const inviteChannelKeywords = [...inviteChannelConfig.replyKeywords];
 
 function clearInviteCodeError() {
   inviteCodeErrorMessage.value = '';
@@ -84,15 +82,6 @@ function syncInviteCodeFromQuery(inviteCode: unknown) {
   model.inviteCode = inviteCode.trim();
 }
 
-async function copyInviteKeywords() {
-  try {
-    await navigator.clipboard.writeText(inviteChannelKeywords.join(' / '));
-    window.$message?.success('回复关键词已复制');
-  } catch {
-    window.$message?.error('复制失败，请手动复制');
-  }
-}
-
 watch(
   () => route.query.inviteCode,
   inviteCode => {
@@ -115,52 +104,24 @@ watch(
   <div class="register-layout">
     <aside class="invite-side-panel">
       <div class="invite-side-header">
-        <div class="invite-side-kicker">邀请码获取</div>
-        <div class="invite-side-title">派聪明RAG实战项目，祝你求职无敌。</div>
+        <div class="invite-side-kicker">团队邀请</div>
+        <div class="invite-side-title">一起把资料变成可查找的知识。</div>
         <div class="invite-side-desc">
-          微信搜索
-          <span class="invite-emphasis">{{ inviteChannelConfig.officialAccountName }}</span>
-          或者扫下面的二维码，后台回复关键字
-          <span class="invite-keyword-mark">{{ inviteChannelKeywords.join(' / ') }}</span>
-          拿内测邀请码。
+          请向团队管理员获取有效邀请码。加入后，你可以在授权范围内查找文档、提问并核对原文。
         </div>
       </div>
-
-      <div class="invite-side-bottom">
-        <div class="invite-qr-shell">
-          <img
-            v-if="inviteChannelConfig.qrCodeImageUrl"
-            :src="inviteChannelConfig.qrCodeImageUrl"
-            alt="公众号二维码"
-            class="invite-qr-image"
-          />
-          <div v-else class="invite-qr-placeholder">
-            <icon-ant-design:wechat-outlined class="invite-qr-icon" />
-            <div class="invite-qr-title">公众号二维码位</div>
-            <div class="invite-qr-desc">后续把二维码地址填到 `qrCodeImageUrl`，这里会直接展示扫码入口。</div>
-          </div>
+      <div class="invite-side-steps">
+        <div class="invite-step-row">
+          <span class="invite-channel-step">1</span>
+          <span>获取团队管理员发出的邀请</span>
         </div>
-
-        <div class="invite-side-steps">
-          <div class="invite-step-row">
-            <span class="invite-channel-step">1</span>
-            <span>
-              微信搜索并关注公众号
-              <span class="invite-emphasis">{{ inviteChannelConfig.officialAccountName }}</span>
-            </span>
-          </div>
-          <div class="invite-step-row">
-            <span class="invite-channel-step">2</span>
-            <span class="invite-step-copy">
-              后台回复关键字
-              <span class="invite-keyword-mark">{{ inviteChannelKeywords.join(' / ') }}</span>
-              <NButton text type="primary" class="invite-inline-copy" @click="copyInviteKeywords">复制</NButton>
-            </span>
-          </div>
-          <div class="invite-step-row">
-            <span class="invite-channel-step">3</span>
-            <span>拿到邀请码后，在右侧完成注册</span>
-          </div>
+        <div class="invite-step-row">
+          <span class="invite-channel-step">2</span>
+          <span>设置账号并填写邀请码</span>
+        </div>
+        <div class="invite-step-row">
+          <span class="invite-channel-step">3</span>
+          <span>登录 DocPilot，开始使用团队资料</span>
         </div>
       </div>
     </aside>
@@ -228,12 +189,7 @@ watch(
         </NButton>
       </NSpace>
 
-      <div class="mt-4 text-center">
-        {{ $t('page.login.register.agreement') }}
-        <NButton text type="primary">{{ $t('page.login.register.protocol') }}</NButton>
-        {{ $t('page.login.register.and') }}
-        <NButton text type="primary">{{ $t('page.login.register.policy') }}</NButton>
-      </div>
+      <p class="text-muted text-center text-12px leading-6">仅加入你被授权访问的团队空间，妥善保管账号信息。</p>
     </NForm>
   </div>
 </template>

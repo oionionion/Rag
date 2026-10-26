@@ -1,0 +1,49 @@
+{
+  "date": "2026-10-25T23:31:03.549260+08:00",
+  "base_commit": "7570eda",
+  "frontend_build": {
+    "command": "pnpm build",
+    "exit_code": 0,
+    "artifact_checks": {
+      "search_modal_final_rule": true,
+      "upload_modal_final_rule": true,
+      "localized_service_error": true,
+      "docpilot_title": true,
+      "license_file": true,
+      "no_legacy_chinese_brand_in_js": true
+    }
+  },
+  "backend_package": {
+    "command": "mvn -B -o -Dmaven.repo.local=/mnt/e/dev/PaiSmart/cache/maven -DskipTests package",
+    "exit_code": 0,
+    "tests_executed": false,
+    "runtime_restarted": true
+  },
+  "typecheck": {
+    "exit_code": 2,
+    "existing_errors": 3,
+    "matches_before_change": true
+  },
+  "eslint": {
+    "existing_errors": 9,
+    "new_errors": 0,
+    "final_changed_style_and_message_files_exit_code": 0
+  },
+  "browser": {
+    "base_checks": 7,
+    "layout_resource_checks": 9,
+    "simulated_state_checks": 12,
+    "page_errors": []
+  },
+  "screenshots": 14,
+  "local_links_missing": [],
+  "git_diff_check": true,
+  "resume_baseline_files_unchanged": 30,
+  "not_verified": [
+    "real upload/parse/embedding/retrieval/answer chain",
+    "paid models",
+    "payment",
+    "production deployment",
+    "all Java tests"
+  ]
+}

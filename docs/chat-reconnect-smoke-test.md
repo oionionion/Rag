@@ -1,3 +1,5 @@
+> DocPilot的可选运行验收脚本，会创建会话并调用模型；请先准备账号和模型调用授权。本轮仅做不调用模型的界面验证，未执行该脚本。
+
 # Chat Reconnect Smoke Test
 
 This repo now includes a reproducible reconnect test script:
@@ -8,7 +10,7 @@ node scripts/chat-reconnect-smoke-test.mjs
 
 Default behavior:
 
-- logs in with `admin / PaiSmart2026!`
+- logs in with `admin / <local-password>`
 - opens a first WebSocket connection
 - sends a long prompt that should stream for a while
 - closes the first socket after a few chunks to simulate user disconnect
@@ -43,7 +45,7 @@ Custom credentials:
 ```bash
 node scripts/chat-reconnect-smoke-test.mjs \
   --username admin \
-  --password PaiSmart2026!
+  --password "$DOCPILOT_TEST_PASSWORD"
 ```
 
 Useful options:

@@ -1,155 +1,3 @@
-<template>
-  <div class="file-preview-container">
-    <div class="preview-backdrop" />
-
-    <div class="preview-content">
-      <template v-if="loading">
-        <div class="state-panel">
-          <div class="state-orb">
-            <NSpin size="large" />
-          </div>
-          <div class="state-copy">
-            <strong>正在装载引用文档</strong>
-            <span>整理线索、页码定位和可预览内容。</span>
-          </div>
-        </div>
-      </template>
-      <template v-else-if="error">
-        <div class="state-panel state-panel--error">
-          <div class="state-orb state-orb--error">
-            <icon-mdi-alert-circle class="text-34" />
-          </div>
-          <div class="state-copy">
-            <strong>这份文档暂时没能打开</strong>
-            <span>{{ error }}</span>
-          </div>
-        </div>
-      </template>
-      <template v-else>
-        <div class="content-wrapper" :class="{ 'content-wrapper--immersive': previewType === 'pdf' && previewUrl }">
-          <aside class="insight-rail">
-            <section class="info-card source-card">
-              <div class="source-card-top">
-                <div class="file-badge-shell">
-                  <div class="file-badge-icon">
-                    <SvgIcon :local-icon="getFileIcon(fileName)" class="text-18" />
-                  </div>
-                  <div class="file-badge-copy">
-                    <h2 class="preview-title">{{ fileName }}</h2>
-                    <p v-if="headerMetaLine" class="preview-subtitle">{{ headerMetaLine }}</p>
-                  </div>
-                </div>
-              </div>
-              <div class="source-actions">
-                <NButton
-                  v-if="previewType !== 'pdf'"
-                  size="small"
-                  secondary
-                  @click="openPreviewInNewTab"
-                  :disabled="!canOpenInNewTab"
-                >
-                  <template #icon>
-                    <icon-mdi-open-in-new />
-                  </template>
-                  新窗口
-                </NButton>
-                <NButton size="small" secondary @click="downloadFile" :loading="downloading">
-                  <template #icon>
-                    <icon-mdi-download />
-                  </template>
-                  下载
-                </NButton>
-                <NButton size="small" quaternary @click="closePreview">
-                  <template #icon>
-                    <icon-mdi-close />
-                  </template>
-                  关闭
-                </NButton>
-              </div>
-            </section>
-
-            <section class="info-card info-card--hero">
-              <span class="info-label">概览</span>
-              <strong class="info-title">{{ heroHeadline }}</strong>
-              <p class="info-copy">{{ heroDescription }}</p>
-              <div v-if="retrievalQuery" class="info-inline-block">
-                <span class="info-label">检索问题</span>
-                <p class="support-copy">{{ retrievalQuery }}</p>
-              </div>
-            </section>
-
-            <section v-if="evidenceSnippet" class="info-card">
-              <span class="info-label">线索</span>
-              <p class="support-copy">{{ evidenceSnippet }}</p>
-            </section>
-
-            <section v-else-if="resolvedHighlightAnchor" class="info-card">
-              <span class="info-label">定位线索</span>
-              <p class="support-copy">{{ resolvedHighlightAnchor }}</p>
-            </section>
-
-          </aside>
-
-          <section class="preview-stage">
-            <div class="stage-body">
-              <template v-if="previewType === 'pdf' && previewUrl">
-                <div class="pdf-preview-stack">
-                  <PdfDocumentViewer
-                    :url="resolvedPreviewUrl"
-                    :source-url="resolvedSourceUrl"
-                    :file-name="fileName"
-                    :page-number="pageNumber"
-                    :single-page-mode="singlePageMode"
-                    :source-page-number="sourcePageNumber"
-                    :anchor-text="resolvedHighlightAnchor"
-                    :search-text="resolvedHighlightSearchText"
-                    :visible="visible"
-                  />
-                </div>
-              </template>
-              <template v-else-if="previewType === 'image' && resolvedPreviewUrl">
-                <div class="image-preview-shell">
-                  <img :src="resolvedPreviewUrl" :alt="fileName" class="preview-image" />
-                </div>
-              </template>
-              <template v-else-if="previewType === 'text'">
-                <div class="text-preview-shell">
-                  <pre class="preview-text">{{ content }}</pre>
-                </div>
-              </template>
-              <template v-else>
-                <div class="download-placeholder">
-                  <div class="placeholder-icon">
-                    <SvgIcon :local-icon="getFileIcon(fileName)" class="text-28" />
-                  </div>
-                  <div class="state-copy">
-                    <strong>当前格式暂不支持在线预览</strong>
-                    <span>你可以先下载文件，或在新窗口中尝试打开原始资源。</span>
-                  </div>
-                  <div class="placeholder-actions">
-                    <NButton secondary @click="openPreviewInNewTab" :disabled="!canOpenInNewTab">
-                      <template #icon>
-                        <icon-mdi-open-in-new />
-                      </template>
-                      新窗口打开
-                    </NButton>
-                    <NButton type="primary" @click="downloadFile">
-                      <template #icon>
-                        <icon-mdi-download />
-                      </template>
-                      下载后查看
-                    </NButton>
-                  </div>
-                </div>
-              </template>
-            </div>
-          </section>
-        </div>
-      </template>
-    </div>
-  </div>
-</template>
-
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 import { NButton, NSpin } from 'naive-ui';
@@ -202,19 +50,19 @@ const fileExtensionLabel = computed(() => {
 });
 const fallbackRetrievalLabel = computed(() => {
   if (props.retrievalMode === 'TEXT_ONLY') {
-    return '关键词召回';
+    return '关键词匹配';
   }
   if (props.retrievalMode === 'HYBRID') {
-    return '混合召回（语义相关 + 关键词）';
+    return '语义与关键词匹配';
   }
   if (props.retrievalMode === 'HYBRID_RRF') {
-    return '混合召回（RRF 融合排序，未经 rerank）';
+    return '语义与关键词匹配';
   }
   if (props.retrievalMode?.startsWith('BM25_ONLY')) {
-    return '关键词召回（语义召回不可用）';
+    return '关键词匹配（语义检索暂不可用）';
   }
   if (props.retrievalMode?.startsWith('KNN_ONLY')) {
-    return '语义召回（关键词召回不可用）';
+    return '语义匹配（关键词检索暂不可用）';
   }
   return '';
 });
@@ -237,23 +85,24 @@ const displayScore = computed(() => {
 });
 const displayPage = computed(() => sourcePageNumber.value || props.pageNumber || undefined);
 const displayPageLabel = computed(() => (displayPage.value ? `第 ${displayPage.value} 页` : ''));
-const displayScoreLabel = computed(() => (displayScore.value ? `相关分数 ${displayScore.value}` : ''));
 const headerMetaLine = computed(() => {
   if (previewType.value === 'pdf') {
     return [displayPageLabel.value, displayScore.value ? `分数 ${displayScore.value}` : ''].filter(Boolean).join(' / ');
   }
   if (previewType.value === 'image') {
-    return [fileExtensionLabel.value, displayScore.value ? `分数 ${displayScore.value}` : ''].filter(Boolean).join(' / ');
+    return [fileExtensionLabel.value, displayScore.value ? `分数 ${displayScore.value}` : '']
+      .filter(Boolean)
+      .join(' / ');
   }
   if (previewType.value === 'text') {
-    return [fileExtensionLabel.value, displayScore.value ? `分数 ${displayScore.value}` : ''].filter(Boolean).join(' / ');
+    return [fileExtensionLabel.value, displayScore.value ? `分数 ${displayScore.value}` : '']
+      .filter(Boolean)
+      .join(' / ');
   }
   return [fileExtensionLabel.value, displayScore.value ? `分数 ${displayScore.value}` : ''].filter(Boolean).join(' / ');
 });
 const heroHeadline = computed(() => {
-  if (props.retrievalLabel || fallbackRetrievalLabel.value) {
-    return props.retrievalLabel || fallbackRetrievalLabel.value;
-  }
+  if (props.retrievalLabel || fallbackRetrievalLabel.value) return fallbackRetrievalLabel.value || '相关原文与检索线索';
   if (previewType.value === 'pdf') {
     return '文档已定位到可阅读页';
   }
@@ -261,7 +110,7 @@ const heroHeadline = computed(() => {
 });
 const heroDescription = computed(() => {
   if (props.retrievalQuery) {
-    return '左侧展示的是本次 RAG 检索的问题与定位线索，右侧则直接打开原始文档，方便核对答案依据。';
+    return '查看提问时找到的证据片段，并对照原文核实答案依据。';
   }
   if (props.evidenceSnippet) {
     return '左侧展示的是这次检索的定位线索，右侧则直接打开原始文档，方便核对答案依据。';
@@ -310,18 +159,25 @@ function getFileIcon(fileName: string) {
 }
 
 // 监听文件名变化，加载预览内容
-watch(() => props.fileName, async (newFileName) => {
-  if (newFileName && props.visible) {
-    await loadPreviewContent();
-  }
-}, { immediate: true });
+watch(
+  () => props.fileName,
+  async newFileName => {
+    if (newFileName && props.visible) {
+      await loadPreviewContent();
+    }
+  },
+  { immediate: true }
+);
 
 // 监听可见性变化
-watch(() => props.visible, async (visible) => {
-  if (visible && props.fileName) {
-    await loadPreviewContent();
+watch(
+  () => props.visible,
+  async visible => {
+    if (visible && props.fileName) {
+      await loadPreviewContent();
+    }
   }
-});
+);
 
 // 加载预览内容
 async function loadPreviewContent() {
@@ -371,15 +227,15 @@ async function loadPreviewContent() {
       });
 
       console.log('[文件预览] MD5模式API响应:', {
-        hasError: !!requestError,
+        hasError: Boolean(requestError),
         error: requestError,
-        hasData: !!data,
+        hasData: Boolean(data),
         contentLength: data?.content?.length || 0,
         contentPreview: data?.content?.substring(0, 100) || ''
       });
 
       if (requestError) {
-        error.value = '预览失败：' + (requestError.message || '未知错误');
+        error.value = `预览失败：${requestError.message || '未知错误'}`;
       } else if (data) {
         previewType.value = data.previewType || 'download';
         content.value = data.content || '';
@@ -414,15 +270,15 @@ async function loadPreviewContent() {
       });
 
       console.log('[文件预览] 文件名模式API响应:', {
-        hasError: !!requestError,
+        hasError: Boolean(requestError),
         error: requestError,
-        hasData: !!data,
+        hasData: Boolean(data),
         contentLength: data?.content?.length || 0,
         contentPreview: data?.content?.substring(0, 100) || ''
       });
 
       if (requestError) {
-        error.value = '预览失败：' + (requestError.message || '未知错误');
+        error.value = `预览失败：${requestError.message || '未知错误'}`;
       } else if (data) {
         previewType.value = data.previewType || 'download';
         content.value = data.content || '';
@@ -433,7 +289,7 @@ async function loadPreviewContent() {
       }
     }
   } catch (err: any) {
-    error.value = '预览失败：' + (err.message || '网络错误');
+    error.value = `预览失败：${err.message || '网络错误'}`;
   } finally {
     loading.value = false;
   }
@@ -461,7 +317,7 @@ async function downloadFile() {
       });
 
       if (requestError) {
-        window.$message?.error('下载失败：' + (requestError.message || '未知错误'));
+        window.$message?.error(`下载失败：${requestError.message || '未知错误'}`);
       } else if (data) {
         // 使用预签名URL下载文件
         const link = document.createElement('a');
@@ -486,7 +342,7 @@ async function downloadFile() {
       });
 
       if (requestError) {
-        window.$message?.error('下载失败：' + (requestError.message || '未知错误'));
+        window.$message?.error(`下载失败：${requestError.message || '未知错误'}`);
       } else if (data) {
         // 使用预签名URL下载文件
         const link = document.createElement('a');
@@ -499,7 +355,7 @@ async function downloadFile() {
       }
     }
   } catch (err: any) {
-    window.$message?.error('下载失败：' + (err.message || '网络错误'));
+    window.$message?.error(`下载失败：${err.message || '网络错误'}`);
   } finally {
     downloading.value = false;
   }
@@ -521,12 +377,166 @@ function openPreviewInNewTab() {
 function closePreview() {
   emit('close');
 }
-
 </script>
+
+<template>
+  <div class="file-preview-container">
+    <div class="preview-backdrop" />
+
+    <div class="preview-content">
+      <template v-if="loading">
+        <div class="state-panel">
+          <div class="state-orb">
+            <NSpin size="large" />
+          </div>
+          <div class="state-copy">
+            <strong>正在打开原文</strong>
+            <span>正在加载文档及对应的引用位置。</span>
+          </div>
+        </div>
+      </template>
+      <template v-else-if="error">
+        <div class="state-panel state-panel--error">
+          <div class="state-orb state-orb--error">
+            <icon-mdi-alert-circle class="text-34" />
+          </div>
+          <div class="state-copy">
+            <strong>这份文档暂时没能打开</strong>
+            <span>{{ error }}</span>
+            <NSpace justify="center" class="mt-4">
+              <NButton type="primary" secondary @click="loadPreviewContent">重新加载</NButton>
+              <NButton @click="closePreview">关闭预览</NButton>
+            </NSpace>
+          </div>
+        </div>
+      </template>
+      <template v-else>
+        <div class="content-wrapper" :class="{ 'content-wrapper--immersive': previewType === 'pdf' && previewUrl }">
+          <aside class="insight-rail">
+            <section class="info-card source-card">
+              <div class="source-card-top">
+                <div class="file-badge-shell">
+                  <div class="file-badge-icon">
+                    <SvgIcon :local-icon="getFileIcon(fileName)" class="text-18" />
+                  </div>
+                  <div class="file-badge-copy">
+                    <h2 class="preview-title">{{ fileName }}</h2>
+                    <p v-if="headerMetaLine" class="preview-subtitle">{{ headerMetaLine }}</p>
+                  </div>
+                </div>
+              </div>
+              <div class="source-actions">
+                <NButton
+                  v-if="previewType !== 'pdf'"
+                  size="small"
+                  secondary
+                  :disabled="!canOpenInNewTab"
+                  @click="openPreviewInNewTab"
+                >
+                  <template #icon>
+                    <icon-mdi-open-in-new />
+                  </template>
+                  新窗口
+                </NButton>
+                <NButton size="small" secondary :loading="downloading" @click="downloadFile">
+                  <template #icon>
+                    <icon-mdi-download />
+                  </template>
+                  下载
+                </NButton>
+                <NButton size="small" quaternary @click="closePreview">
+                  <template #icon>
+                    <icon-mdi-close />
+                  </template>
+                  关闭
+                </NButton>
+              </div>
+            </section>
+
+            <section class="info-card info-card--hero">
+              <span class="info-label">概览</span>
+              <strong class="info-title">{{ heroHeadline }}</strong>
+              <p class="info-copy">{{ heroDescription }}</p>
+              <div v-if="retrievalQuery" class="info-inline-block">
+                <span class="info-label">检索问题</span>
+                <p class="support-copy">{{ retrievalQuery }}</p>
+              </div>
+            </section>
+
+            <section v-if="evidenceSnippet" class="info-card">
+              <span class="info-label">引用证据</span>
+              <p class="support-copy">{{ evidenceSnippet }}</p>
+            </section>
+
+            <section v-else-if="resolvedHighlightAnchor" class="info-card">
+              <span class="info-label">定位线索</span>
+              <p class="support-copy">{{ resolvedHighlightAnchor }}</p>
+            </section>
+          </aside>
+
+          <section class="preview-stage">
+            <div class="stage-body">
+              <template v-if="previewType === 'pdf' && previewUrl">
+                <div class="pdf-preview-stack">
+                  <PdfDocumentViewer
+                    :url="resolvedPreviewUrl"
+                    :source-url="resolvedSourceUrl"
+                    :file-name="fileName"
+                    :page-number="pageNumber"
+                    :single-page-mode="singlePageMode"
+                    :source-page-number="sourcePageNumber"
+                    :anchor-text="resolvedHighlightAnchor"
+                    :search-text="resolvedHighlightSearchText"
+                    :visible="visible"
+                  />
+                </div>
+              </template>
+              <template v-else-if="previewType === 'image' && resolvedPreviewUrl">
+                <div class="image-preview-shell">
+                  <img :src="resolvedPreviewUrl" :alt="fileName" class="preview-image" />
+                </div>
+              </template>
+              <template v-else-if="previewType === 'text'">
+                <div class="text-preview-shell">
+                  <pre class="preview-text">{{ content }}</pre>
+                </div>
+              </template>
+              <template v-else>
+                <div class="download-placeholder">
+                  <div class="placeholder-icon">
+                    <SvgIcon :local-icon="getFileIcon(fileName)" class="text-28" />
+                  </div>
+                  <div class="state-copy">
+                    <strong>当前格式暂不支持在线预览</strong>
+                    <span>你可以先下载文件，或在新窗口中尝试打开原始资源。</span>
+                  </div>
+                  <div class="placeholder-actions">
+                    <NButton secondary :disabled="!canOpenInNewTab" @click="openPreviewInNewTab">
+                      <template #icon>
+                        <icon-mdi-open-in-new />
+                      </template>
+                      新窗口打开
+                    </NButton>
+                    <NButton type="primary" @click="downloadFile">
+                      <template #icon>
+                        <icon-mdi-download />
+                      </template>
+                      下载后查看
+                    </NButton>
+                  </div>
+                </div>
+              </template>
+            </div>
+          </section>
+        </div>
+      </template>
+    </div>
+  </div>
+</template>
 
 <style scoped lang="scss">
 .file-preview-container {
-  @apply relative flex h-full min-h-0 flex-col overflow-hidden bg-white;
+  @apply relative flex h-full min-h-0 flex-col overflow-hidden bg-container;
   height: min(92vh, calc(100vh - 20px));
   min-height: min(760px, calc(100vh - 20px));
 
@@ -539,7 +549,7 @@ function closePreview() {
   }
 
   .file-badge-icon {
-    @apply flex h-13 w-13 shrink-0 items-center justify-center rounded-14px border border-stone-200 bg-stone-50 text-primary shadow-sm;
+    @apply flex h-13 w-13 shrink-0 items-center justify-center rounded-14px border border-primary/12 bg-primary/4 text-primary shadow-sm;
   }
 
   .file-badge-copy {
@@ -547,15 +557,15 @@ function closePreview() {
   }
 
   .preview-title {
-    @apply m-0 truncate text-[17px] font-700 leading-tight text-stone-800;
+    @apply m-0 truncate text-[17px] font-700 leading-tight text-[var(--app-text)];
   }
 
   .preview-subtitle {
-    @apply mt-1 text-sm text-stone-500;
+    @apply mt-1 text-sm text-[var(--app-muted)];
   }
 
   .preview-content {
-    @apply relative z-1 min-h-0 flex-1 overflow-hidden bg-white px-3 py-3;
+    @apply relative z-1 min-h-0 flex-1 overflow-hidden bg-container px-3 py-3;
 
     .content-wrapper {
       @apply grid h-full min-h-0 grid-cols-[240px_minmax(0,1fr)] gap-3 overflow-hidden;
@@ -566,7 +576,7 @@ function closePreview() {
     }
 
     .state-panel {
-      @apply flex h-full min-h-[420px] flex-col items-center justify-center gap-5 rounded-16px border border-stone-200 bg-white px-10 text-center shadow-sm;
+      @apply flex h-full min-h-[420px] flex-col items-center justify-center gap-5 rounded-16px border border-primary/12 bg-container px-10 text-center shadow-sm;
     }
 
     .state-panel--error {
@@ -574,7 +584,7 @@ function closePreview() {
     }
 
     .state-orb {
-      @apply flex h-16 w-16 items-center justify-center rounded-full border border-stone-200 bg-stone-50 text-stone-700;
+      @apply flex h-16 w-16 items-center justify-center rounded-full border border-primary/12 bg-primary/4 text-[var(--app-text)];
     }
 
     .state-orb--error {
@@ -582,11 +592,11 @@ function closePreview() {
     }
 
     .state-copy {
-      @apply flex max-w-520px flex-col gap-2 text-stone-600;
+      @apply flex max-w-520px flex-col gap-2 text-[var(--app-muted)];
     }
 
     .state-copy strong {
-      @apply text-lg text-stone-800;
+      @apply text-lg text-[var(--app-text)];
       font-family: 'Avenir Next', 'Segoe UI', sans-serif;
     }
 
@@ -595,7 +605,7 @@ function closePreview() {
     }
 
     .info-card {
-      @apply rounded-12px bg-stone-50 p-4 text-stone-700;
+      @apply rounded-12px bg-primary/4 p-4 text-[var(--app-text)];
     }
 
     .info-card--hero {
@@ -603,7 +613,7 @@ function closePreview() {
     }
 
     .source-card {
-      @apply gap-0 rounded-16px border border-stone-200 bg-white p-4 shadow-sm;
+      @apply gap-0 rounded-16px border border-primary/12 bg-container p-4 shadow-sm;
     }
 
     .source-card-top {
@@ -615,7 +625,7 @@ function closePreview() {
     }
 
     .info-card--quiet {
-      @apply bg-stone-50;
+      @apply bg-primary/4;
     }
 
     .info-row {
@@ -623,11 +633,11 @@ function closePreview() {
     }
 
     .info-label {
-      @apply text-[11px] uppercase tracking-[0.16em] text-stone-500;
+      @apply text-[11px] uppercase tracking-[0.16em] text-[var(--app-muted)];
     }
 
     .info-title {
-      @apply mt-3 block whitespace-nowrap text-sm font-700 leading-tight text-stone-900;
+      @apply mt-3 block text-sm font-700 leading-tight text-[var(--app-text)];
     }
 
     .info-copy,
@@ -646,11 +656,11 @@ function closePreview() {
     }
 
     .preview-stage {
-      @apply min-h-0 overflow-hidden bg-white;
+      @apply min-h-0 overflow-hidden bg-container;
     }
 
     .stage-body {
-      @apply h-full min-h-0 overflow-hidden rounded-16px border border-stone-200 bg-white;
+      @apply h-full min-h-0 overflow-hidden rounded-16px border border-primary/12 bg-container;
     }
 
     .pdf-preview-stack {
@@ -658,17 +668,17 @@ function closePreview() {
     }
 
     .text-preview-shell {
-      @apply h-full bg-white p-4;
+      @apply h-full bg-container p-4;
     }
 
     .preview-text {
-      @apply m-0 h-full overflow-auto text-[14px] whitespace-pre-wrap break-words text-stone-700;
+      @apply m-0 h-full overflow-auto text-[14px] whitespace-pre-wrap break-words text-[var(--app-text)];
       font-family: 'SFMono-Regular', 'Menlo', 'Monaco', monospace;
       line-height: 1.68;
     }
 
     .image-preview-shell {
-      @apply flex h-full min-h-0 items-center justify-center overflow-auto bg-white p-4;
+      @apply flex h-full min-h-0 items-center justify-center overflow-auto bg-container p-4;
     }
 
     .preview-image {
@@ -676,11 +686,11 @@ function closePreview() {
     }
 
     .download-placeholder {
-      @apply flex h-full min-h-[320px] flex-col items-center justify-center gap-5 rounded-12px bg-stone-50 px-8 text-center text-stone-500;
+      @apply flex h-full min-h-[320px] flex-col items-center justify-center gap-5 rounded-12px bg-primary/4 px-8 text-center text-[var(--app-muted)];
     }
 
     .placeholder-icon {
-      @apply flex h-16 w-16 items-center justify-center rounded-full bg-stone-100 text-stone-700;
+      @apply flex h-16 w-16 items-center justify-center rounded-full bg-primary/8 text-[var(--app-text)];
     }
 
     .placeholder-actions {

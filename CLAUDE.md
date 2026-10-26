@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-PaiSmart (派聪明) is an enterprise-grade AI knowledge management system built with RAG (Retrieval-Augmented Generation) technology. It provides intelligent document processing and retrieval capabilities using a modern tech stack including Spring Boot, Vue 3, Elasticsearch, and AI services.
+DocPilot — 团队知识库助手 is a team document search and intelligent Q&A application based on PaiSmart. Public UI uses DocPilot; upstream attribution and internal identifiers remain intact. It supports document management, permission-aware retrieval, answers and source references using Spring Boot, Vue 3 and Elasticsearch.
 
 ## Development Environment Setup
 
@@ -20,17 +20,14 @@ PaiSmart (派聪明) is an enterprise-grade AI knowledge management system built
 - Redis 7.0.11
 - Docker (optional for services)
 
-### Quick Start with Docker
+### Current local quick start
 ```bash
-# Start all services
-cd docs && docker-compose up -d
-
-# Backend
-mvn spring-boot:run
-
-# Frontend
-cd frontend && pnpm install && pnpm dev
+# Repository root; existing isolated setup only
+bash status-local.sh
+bash start-local.sh
 ```
+
+Open `http://localhost:9527`. These wrappers require `/mnt/e/dev/PaiSmart/paismart.py`; they do not install a fresh environment. See [local setup](本地运行说明.md) and [configuration](docs/CONFIGURATION.md) for manual startup. `docs/docker-compose.yaml` is a legacy infrastructure template, not a complete app deployment.
 
 ## Common Development Commands
 
@@ -64,7 +61,7 @@ pnpm build
 pnpm typecheck
 
 # Linting
-pnpm lint
+pnpm exec eslint src/views/knowledge-base/index.vue
 
 # Preview build
 pnpm preview
@@ -118,7 +115,7 @@ frontend/src/
 - **RAG Pipeline**: Document → Chunk → Embedding → Search → Response
 
 ### Multi-tenant Architecture
-- **Organization Tags**: Supports multi-tenant isolation
+- **Organization Tags**: Permission filtering by uploader OR public flag OR effective organization tags; not physical tenant isolation
 - **Permission System**: Public/private document access control
 - **User-Organization Mapping**: Flexible user-to-org relationships
 
@@ -196,7 +193,7 @@ mvn clean verify
 pnpm typecheck
 
 # Linting
-pnpm lint
+pnpm exec eslint src/views/knowledge-base/index.vue
 
 # Build verification
 pnpm build
@@ -227,7 +224,7 @@ Key configuration variables that should be set in production:
 
 - JWT-based authentication with Spring Security
 - Role-based access control (admin/user)
-- Organization-level data isolation
+- Organization-tag visibility filtering; review actual OR conditions before describing isolation
 - File upload validation and size limits
 - CORS configuration for frontend integration
 - Input validation and sanitization

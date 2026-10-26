@@ -4,32 +4,32 @@ export const themeSettings: App.Theme.ThemeSetting = {
   grayscale: false,
   colourWeakness: false,
   recommendColor: true,
-  themeColor: '#646cff',
+  themeColor: '#0f766e',
   otherColor: { info: '#2080f0', success: '#52c41a', warning: '#faad14', error: '#f5222d' },
   isInfoFollowPrimary: true,
   resetCacheStrategy: 'close',
   layout: { mode: 'vertical', scrollMode: 'content', reverseHorizontalMix: false },
   page: { animate: true, animateMode: 'fade-slide' },
-  header: { height: 56, breadcrumb: { visible: false, showIcon: true }, multilingual: { visible: false } },
+  header: { height: 64, breadcrumb: { visible: false, showIcon: true }, multilingual: { visible: false } },
   tab: { visible: false, cache: true, height: 44, mode: 'chrome' },
   fixedHeaderAndTab: true,
   sider: {
     inverted: false,
-    width: 180,
+    width: 216,
     collapsedWidth: 64,
     mixWidth: 90,
     mixCollapsedWidth: 64,
     mixChildMenuWidth: 200
   },
-  footer: { visible: false, fixed: false, height: 48, right: true },
-  watermark: { visible: false, text: '派聪明 PaiSmart' },
+  footer: { visible: true, fixed: false, height: 36, right: true },
+  watermark: { visible: false, text: 'DocPilot' },
   tokens: {
     light: {
       colors: {
         container: 'rgb(255, 255, 255)',
-        layout: 'rgb(247, 250, 252)',
+        layout: 'rgb(244, 247, 248)',
         inverted: 'rgb(0, 20, 40)',
-        'base-text': 'rgb(31, 31, 31)'
+        'base-text': 'rgb(36, 48, 65)'
       },
       boxShadow: {
         header: '0 1px 2px rgb(0, 21, 41, 0.08)',
@@ -46,4 +46,10 @@ export const themeSettings: App.Theme.ThemeSetting = {
  *
  * If publish new version, use `overrideThemeSettings` to override certain theme settings
  */
-export const overrideThemeSettings: Partial<App.Theme.ThemeSetting> = {};
+export const overrideThemeSettings: Partial<App.Theme.ThemeSetting> = {
+  themeColor: themeSettings.themeColor,
+  sider: themeSettings.sider,
+  header: themeSettings.header,
+  footer: themeSettings.footer,
+  watermark: themeSettings.watermark
+};

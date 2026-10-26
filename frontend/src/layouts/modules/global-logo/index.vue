@@ -16,12 +16,42 @@ withDefaults(defineProps<Props>(), {
 </script>
 
 <template>
-  <RouterLink to="/" class="w-full flex-center nowrap-hidden">
-    <SystemLogo class="text-32px text-primary" />
-    <h2 v-show="showTitle" class="pl-8px text-16px text-primary font-bold transition duration-300 ease-in-out">
-      {{ $t('system.title') }}
-    </h2>
+  <RouterLink to="/" class="brand-lockup" aria-label="DocPilot 首页">
+    <SystemLogo class="brand-icon" />
+    <div v-show="showTitle" class="brand-copy">
+      <h2>{{ $t('system.title') }}</h2>
+      <span>团队知识库助手</span>
+    </div>
   </RouterLink>
 </template>
 
-<style scoped></style>
+<style scoped>
+.brand-lockup {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  overflow: hidden;
+  white-space: nowrap;
+  color: rgb(var(--primary-color));
+}
+.brand-icon {
+  width: 31px;
+  height: 31px;
+  flex-shrink: 0;
+}
+.brand-copy h2 {
+  font-size: 20px;
+  line-height: 1.25;
+  font-weight: 750;
+  letter-spacing: -0.6px;
+}
+.brand-copy span {
+  display: block;
+  margin-top: 3px;
+  font-size: 10px;
+  letter-spacing: 1.1px;
+  color: var(--app-muted);
+}
+</style>

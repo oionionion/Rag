@@ -151,7 +151,15 @@ watch(
     </div>
 
     <div v-else-if="!hasPreviewTarget" class="preview-page-empty">
-      <NEmpty :description="loadError || '没有拿到可预览的引用信息'" />
+      <NEmpty :description="loadError || '这条引用暂时无法打开'">
+        <template #extra>
+          <p class="text-muted mb-4 text-13px">请返回对话重新点击来源；文档可能已删除或访问权限发生变化。</p>
+          <NSpace justify="center">
+            <NButton v-if="sessionId && referenceNumber" @click="loadReferenceDetail">重新加载</NButton>
+            <NButton type="primary" secondary @click="handleBack">返回对话</NButton>
+          </NSpace>
+        </template>
+      </NEmpty>
     </div>
 
     <div v-else class="preview-page-shell">
@@ -179,11 +187,14 @@ watch(
 
 <style scoped lang="scss">
 .preview-page-state {
-  @apply flex min-h-220px flex-col items-center justify-center gap-4 rounded-12px bg-white text-stone-500;
+  @apply flex min-h-220px flex-col items-center justify-center gap-4 rounded-12px;
+  background: var(--app-surface);
+  color: var(--app-muted);
 }
 
 .preview-page-empty {
-  @apply rounded-12px bg-white py-10;
+  @apply rounded-12px py-10;
+  background: var(--app-surface);
 }
 
 .preview-page-shell {

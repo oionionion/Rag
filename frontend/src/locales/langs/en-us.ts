@@ -1,6 +1,6 @@
 const local: App.I18n.Schema = {
   system: {
-    title: 'PaiSmart',
+    title: 'DocPilot',
     updateTitle: 'System Version Update Notification',
     updateContent: 'A new version of the system has been detected. Do you want to refresh the page immediately?',
     updateConfirm: 'Refresh immediately',
@@ -162,10 +162,10 @@ const local: App.I18n.Schema = {
     404: 'Page Not Found',
     500: 'Server Error',
     'iframe-page': 'Iframe',
-    chat: 'Chat Assistant',
+    chat: 'Knowledge Chat',
     'chat-history': 'Chat History',
     'invite-code': 'Invite Codes',
-    'knowledge-base': 'Knowledge Base',
+    'knowledge-base': 'Documents',
     'model-provider': 'Model Providers',
     'org-tag': 'Organization Tag',
     'usage-monitor': 'Usage Monitor',
@@ -217,8 +217,7 @@ const local: App.I18n.Schema = {
         protocol: '《User Agreement》',
         and: 'and',
         policy: '《Privacy Policy》',
-        inviteCodeTip:
-          'This site is invite-only. If you do not have an invite code yet, follow the WeChat official account "沉默王二" and reply with "聪明".'
+        inviteCodeTip: 'This workspace is invite-only. Ask your team administrator for an invitation code.'
       },
       resetPwd: {
         title: 'Reset Password'

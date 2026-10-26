@@ -1,0 +1,224 @@
+{
+  "baseline": [
+    {
+      "file": "src/components/custom/file-preview.vue",
+      "messages": [
+        {
+          "rule": "@typescript-eslint/no-unused-vars",
+          "message": "'displayScoreLabel' is assigned a value but never used. Allowed unused vars must match /^_/u."
+        },
+        {
+          "rule": "complexity",
+          "message": "Async function 'loadPreviewContent' has a complexity of 35. Maximum allowed is 20."
+        },
+        {
+          "rule": "no-implicit-coercion",
+          "message": "Unexpected implicit coercion encountered. Use `Boolean(requestError)` instead."
+        },
+        {
+          "rule": "no-implicit-coercion",
+          "message": "Unexpected implicit coercion encountered. Use `Boolean(data)` instead."
+        },
+        {
+          "rule": "prefer-template",
+          "message": "Unexpected string concatenation."
+        },
+        {
+          "rule": "no-implicit-coercion",
+          "message": "Unexpected implicit coercion encountered. Use `Boolean(requestError)` instead."
+        },
+        {
+          "rule": "no-implicit-coercion",
+          "message": "Unexpected implicit coercion encountered. Use `Boolean(data)` instead."
+        },
+        {
+          "rule": "prefer-template",
+          "message": "Unexpected string concatenation."
+        },
+        {
+          "rule": "prefer-template",
+          "message": "Unexpected string concatenation."
+        },
+        {
+          "rule": "prefer-template",
+          "message": "Unexpected string concatenation."
+        },
+        {
+          "rule": "prefer-template",
+          "message": "Unexpected string concatenation."
+        },
+        {
+          "rule": "prefer-template",
+          "message": "Unexpected string concatenation."
+        }
+      ]
+    },
+    {
+      "file": "src/views/chat/modules/chat-message.vue",
+      "messages": [
+        {
+          "rule": "no-useless-escape",
+          "message": "Unnecessary escape character: \\[."
+        },
+        {
+          "rule": "no-continue",
+          "message": "Unexpected use of continue statement."
+        },
+        {
+          "rule": "no-continue",
+          "message": "Unexpected use of continue statement."
+        },
+        {
+          "rule": "max-params",
+          "message": "Arrow function has too many parameters (4). Maximum allowed is 3."
+        },
+        {
+          "rule": "max-params",
+          "message": "Arrow function has too many parameters (4). Maximum allowed is 3."
+        },
+        {
+          "rule": "complexity",
+          "message": "Async function 'handleSourceFileClick' has a complexity of 44. Maximum allowed is 20."
+        }
+      ]
+    },
+    {
+      "file": "src/views/chat/modules/reference-preview-page.vue",
+      "messages": [
+        {
+          "rule": "complexity",
+          "message": "Async function 'loadReferenceDetail' has a complexity of 25. Maximum allowed is 20."
+        },
+        {
+          "rule": "no-void",
+          "message": "Expected 'undefined' and instead saw 'void'."
+        }
+      ]
+    }
+  ],
+  "current": [
+    {
+      "file": "src/components/custom/file-preview.vue",
+      "messages": [
+        {
+          "rule": "vue/no-unused-properties",
+          "message": "'chunkId' of property found, but never used.",
+          "severity": 1,
+          "line": 22
+        },
+        {
+          "rule": "complexity",
+          "message": "Async function 'loadPreviewContent' has a complexity of 35. Maximum allowed is 20.",
+          "severity": 2,
+          "line": 183
+        },
+        {
+          "rule": "no-console",
+          "message": "Unexpected console statement.",
+          "severity": 1,
+          "line": 186
+        },
+        {
+          "rule": "no-console",
+          "message": "Unexpected console statement.",
+          "severity": 1,
+          "line": 204
+        },
+        {
+          "rule": "no-console",
+          "message": "Unexpected console statement.",
+          "severity": 1,
+          "line": 229
+        },
+        {
+          "rule": "no-console",
+          "message": "Unexpected console statement.",
+          "severity": 1,
+          "line": 249
+        },
+        {
+          "rule": "no-console",
+          "message": "Unexpected console statement.",
+          "severity": 1,
+          "line": 272
+        }
+      ]
+    },
+    {
+      "file": "src/views/chat/modules/chat-message.vue",
+      "messages": [
+        {
+          "rule": "no-useless-escape",
+          "message": "Unnecessary escape character: \\[.",
+          "severity": 2,
+          "line": 74
+        },
+        {
+          "rule": "no-continue",
+          "message": "Unexpected use of continue statement.",
+          "severity": 2,
+          "line": 108
+        },
+        {
+          "rule": "no-continue",
+          "message": "Unexpected use of continue statement.",
+          "severity": 2,
+          "line": 120
+        },
+        {
+          "rule": "max-params",
+          "message": "Arrow function has too many parameters (4). Maximum allowed is 3.",
+          "severity": 2,
+          "line": 189
+        },
+        {
+          "rule": "max-params",
+          "message": "Arrow function has too many parameters (4). Maximum allowed is 3.",
+          "severity": 2,
+          "line": 196
+        },
+        {
+          "rule": "complexity",
+          "message": "Async function 'handleSourceFileClick' has a complexity of 44. Maximum allowed is 20.",
+          "severity": 2,
+          "line": 286
+        },
+        {
+          "rule": "no-console",
+          "message": "Unexpected console statement.",
+          "severity": 1,
+          "line": 296
+        },
+        {
+          "rule": "no-console",
+          "message": "Unexpected console statement.",
+          "severity": 1,
+          "line": 328
+        },
+        {
+          "rule": "no-console",
+          "message": "Unexpected console statement.",
+          "severity": 1,
+          "line": 368
+        }
+      ]
+    },
+    {
+      "file": "src/views/chat/modules/reference-preview-page.vue",
+      "messages": [
+        {
+          "rule": "complexity",
+          "message": "Async function 'loadReferenceDetail' has a complexity of 25. Maximum allowed is 20.",
+          "severity": 2,
+          "line": 81
+        },
+        {
+          "rule": "no-void",
+          "message": "Expected 'undefined' and instead saw 'void'.",
+          "severity": 2,
+          "line": 140
+        }
+      ]
+    }
+  ]
+}

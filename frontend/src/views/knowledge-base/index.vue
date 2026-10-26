@@ -11,6 +11,8 @@ import SearchDialog from './modules/search-dialog.vue';
 
 const appStore = useAppStore();
 const authStore = useAuthStore();
+const documentLoadFailed = ref(false);
+const retryingFiles = ref<Set<string>>(new Set());
 
 // 文件预览相关状态
 const previewVisible = ref(false);
@@ -22,6 +24,7 @@ async function apiFn(params: Api.Common.CommonSearchParams = {}): Promise<FlatRe
     url: '/documents/accessible',
     params
   });
+  documentLoadFailed.value = Boolean(response.error);
   if (response.error) return response as FlatResponseData<Api.KnowledgeBase.List>;
 
   const payload = response.data;
@@ -78,7 +81,7 @@ const { columns, columnChecks, data, getData, loading, mobilePagination } = useT
   columns: () => [
     {
       key: 'fileName',
-      title: '文件名',
+      title: '文档名称',
       minWidth: 300,
       render: row => (
         <div class="flex items-center">
@@ -96,7 +99,7 @@ const { columns, columnChecks, data, getData, loading, mobilePagination } = useT
     },
     {
       key: 'fileMd5',
-      title: 'MD5',
+      title: '文档标识',
       width: 120,
       render: row => (
         <NEllipsis tooltip>
@@ -104,9 +107,9 @@ const { columns, columnChecks, data, getData, loading, mobilePagination } = useT
             class="cursor-pointer text-3 font-mono transition-colors hover:text-primary"
             onClick={() => {
               navigator.clipboard.writeText(row.fileMd5);
-              window.$message?.success('MD5已复制');
+              window.$message?.success('文档标识已复制');
             }}
-            title="点击复制MD5"
+            title="点击复制文档标识"
           >
             {row.fileMd5.substring(0, 8)}...
           </span>
@@ -121,40 +124,40 @@ const { columns, columnChecks, data, getData, loading, mobilePagination } = useT
     },
     {
       key: 'estimatedEmbeddingTokens',
-      title: '预估向量化',
+      title: '预计内容量',
       width: 160,
       render: row => renderEstimatedEmbeddingUsage(row)
     },
     {
       key: 'actualEmbeddingTokens',
-      title: '实际向量化',
+      title: '内容处理',
       width: 160,
       render: row => renderActualEmbeddingUsage(row)
     },
     {
       key: 'status',
-      title: '上传状态',
+      title: '上传进度',
       width: 100,
       render: row => renderStatus(row.status, row.progress)
     },
     {
       key: 'orgTagName',
-      title: '组织标签',
+      title: '所属空间',
       width: 150,
       ellipsis: { tooltip: true, lineClamp: 2 }
     },
     {
       key: 'isPublic',
-      title: '是否公开',
+      title: '共享范围',
       width: 100,
       render: row =>
         row.public || row.isPublic ? (
           <NTag bordered={false} type="success">
-            公开
+            所有用户
           </NTag>
         ) : (
           <NTag bordered={false} type="warning">
-            私有
+            组织内
           </NTag>
         )
     },
@@ -177,7 +180,7 @@ const { columns, columnChecks, data, getData, loading, mobilePagination } = useT
           {canManageFile(row) ? (
             <NPopconfirm onPositiveClick={() => handleDelete(row.fileMd5)}>
               {{
-                default: () => '确认删除当前文件吗？',
+                default: () => '删除后将无法继续检索该文档，相关引用也可能失效。确认删除？',
                 trigger: () => (
                   <NButton type="error" quaternary size="small">
                     删除
@@ -190,6 +193,11 @@ const { columns, columnChecks, data, getData, loading, mobilePagination } = useT
       )
     }
   ]
+});
+
+// Keep technical identifiers available in column settings without crowding the document list.
+columnChecks.value.forEach(column => {
+  if (column.key === 'fileMd5' || column.key === 'estimatedEmbeddingTokens') column.checked = false;
 });
 
 const store = useKnowledgeBaseStore();
@@ -292,30 +300,30 @@ function renderStatus(status: UploadStatus, percentage: number) {
   if (status === UploadStatus.Completed)
     return (
       <NTag bordered={false} type="success">
-        已完成
+        已上传
       </NTag>
     );
-  else if (status === UploadStatus.Break)
+  if (status === UploadStatus.Break)
     return (
-      <NTag bordered={false} type="error">
+      <NTag bordered={false} type="warning">
         上传中断
       </NTag>
     );
-  return <NProgress percentage={percentage} processing />;
+  if (status === UploadStatus.Pending) return <NTag bordered={false}>等待上传</NTag>;
+  if (status === UploadStatus.Paused)
+    return (
+      <NTag bordered={false} type="warning">
+        已暂停
+      </NTag>
+    );
+  return <NProgress percentage={Math.min(100, Math.max(0, percentage || 0))} processing />;
 }
 
 function renderEstimatedEmbeddingUsage(row: Api.KnowledgeBase.UploadTask) {
-  if (!row.estimatedEmbeddingTokens) {
-    return <span class="text-muted text-xs">-</span>;
-  }
-
-  const estimatedTokenLabel = Number(row.estimatedEmbeddingTokens).toLocaleString();
-  const estimatedChunkLabel = Number(row.estimatedChunkCount || 0).toLocaleString();
   return (
-    <div class="text-muted text-xs leading-5">
-      <div>{estimatedTokenLabel} Tokens</div>
-      <div class="text-muted">{estimatedChunkLabel} 个切片</div>
-    </div>
+    <span class="text-muted text-xs">
+      {row.estimatedChunkCount ? `${row.estimatedChunkCount} 个内容片段` : '待处理后确认'}
+    </span>
   );
 }
 
@@ -339,97 +347,68 @@ function canRetryVectorization(row: Api.KnowledgeBase.UploadTask) {
 }
 
 async function handleRetryVectorization(row: Api.KnowledgeBase.UploadTask) {
-  const { error } = await request({
-    url: `/documents/${row.fileMd5}/vectorization/retry`,
-    method: 'POST'
-  });
-
-  if (error) return;
-
-  row.vectorizationStatus = 'PROCESSING';
-  row.vectorizationErrorMessage = null;
-  row.actualEmbeddingTokens = undefined;
-  row.actualChunkCount = undefined;
-  window.$message?.success('已提交异步向量化重试任务');
-  await getList();
+  if (retryingFiles.value.has(row.fileMd5)) return;
+  retryingFiles.value.add(row.fileMd5);
+  try {
+    const { error } = await request({
+      url: `/documents/${row.fileMd5}/vectorization/retry`,
+      method: 'POST'
+    });
+    if (error) return;
+    row.vectorizationStatus = 'PROCESSING';
+    row.vectorizationErrorMessage = null;
+    row.actualEmbeddingTokens = undefined;
+    row.actualChunkCount = undefined;
+    window.$message?.success('已提交处理任务，完成后即可检索');
+    await getList();
+  } finally {
+    retryingFiles.value.delete(row.fileMd5);
+  }
 }
 
 function renderActualEmbeddingUsage(row: Api.KnowledgeBase.UploadTask) {
-  if (row.status !== UploadStatus.Completed) {
-    return <span class="text-muted text-xs">-</span>;
-  }
-
-  if (hasActualVectorizationUsage(row)) {
-    const actualTokenLabel = Number(row.actualEmbeddingTokens).toLocaleString();
-    const actualChunkLabel = Number(row.actualChunkCount || 0).toLocaleString();
-    return (
-      <div class="text-xs text-emerald-700 leading-5">
-        <div>{actualTokenLabel} Tokens</div>
-        <div class="text-muted">{actualChunkLabel} 个切片</div>
-      </div>
-    );
-  }
-
+  if (row.status !== UploadStatus.Completed) return <span class="text-muted text-xs">等待上传完成</span>;
   if (isVectorizationProcessing(row)) {
     return (
-      <div class="text-xs text-sky-700 leading-5">
-        <div>向量化处理中</div>
-        <div class="text-muted">完成后会回写实际 Tokens</div>
+      <div class="flex flex-col gap-6px text-xs">
+        <NTag bordered={false} type="info">
+          {row.vectorizationStatus === 'PENDING' ? '等待处理' : '处理中'}
+        </NTag>
+        <span class="text-muted">完成后可用于检索与问答</span>
       </div>
     );
   }
-
   if (row.vectorizationStatus === 'COMPLETED') {
     return (
-      <div class="flex flex-col gap-6px text-xs leading-5">
-        <div class="text-emerald-700 font-500">向量化已完成</div>
-        <NEllipsis tooltip lineClamp={2} class="text-muted">
-          {row.vectorizationErrorMessage || '历史数据未统计实际 Tokens，可按需重试回写'}
-        </NEllipsis>
-        {canRetryVectorization(row) ? (
-          <div>
-            <NButton size="tiny" quaternary onClick={() => handleRetryVectorization(row)}>
-              重试向量化
-            </NButton>
-          </div>
-        ) : null}
+      <div class="flex flex-col gap-6px text-xs">
+        <NTag bordered={false} type="success">
+          可检索
+        </NTag>
+        <span class="text-muted">{row.actualChunkCount ? `${row.actualChunkCount} 个内容片段` : '内容处理完成'}</span>
       </div>
     );
   }
-
-  if (row.vectorizationStatus === 'FAILED') {
-    return (
-      <div class="flex flex-col gap-6px text-xs leading-5">
-        <div class="text-rose-600 font-500">向量化失败</div>
-        <NEllipsis tooltip lineClamp={2} class="text-muted">
-          {row.vectorizationErrorMessage || '请检查 Embedding 额度或稍后重试'}
-        </NEllipsis>
-        {canRetryVectorization(row) ? (
-          <div>
-            <NButton size="tiny" type="error" quaternary onClick={() => handleRetryVectorization(row)}>
-              重试向量化
-            </NButton>
-          </div>
-        ) : null}
-      </div>
-    );
-  }
-
-  if (canRetryVectorization(row)) {
-    return (
-      <div class="flex flex-col gap-6px text-xs leading-5">
-        <div class="text-amber-600">暂无实际向量化结果</div>
-        <div class="text-muted">可能仍在处理，或历史任务未回写结果</div>
-        <div>
-          <NButton size="tiny" quaternary onClick={() => handleRetryVectorization(row)}>
-            重试向量化
-          </NButton>
-        </div>
-      </div>
-    );
-  }
-
-  return <span class="text-muted text-xs">-</span>;
+  return (
+    <div class="flex flex-col gap-6px text-xs leading-5">
+      <NTag bordered={false} type={row.vectorizationStatus === 'FAILED' ? 'error' : 'warning'}>
+        {row.vectorizationStatus === 'FAILED' ? '处理失败' : '状态待更新'}
+      </NTag>
+      <NEllipsis tooltip lineClamp={2} class="text-muted">
+        {row.vectorizationErrorMessage || '请刷新状态；如持续未完成，可联系管理员检查后重试。'}
+      </NEllipsis>
+      {canRetryVectorization(row) ? (
+        <NButton
+          size="tiny"
+          type="primary"
+          quaternary
+          loading={retryingFiles.value.has(row.fileMd5)}
+          onClick={() => handleRetryVectorization(row)}
+        >
+          重试处理
+        </NButton>
+      ) : null}
+    </div>
+  );
 }
 
 // 向量化状态由后端通过聊天 WebSocket 推送（document_status 事件），这里复用同一条连接
@@ -585,7 +564,18 @@ async function onBeforeUpload(
 
 <template>
   <div class="workspace-page min-h-500px flex-col-stretch gap-16px overflow-hidden lt-sm:overflow-auto">
-    <NCard title="文件列表" :bordered="false" size="small" class="page-section sm:flex-1-hidden">
+    <header class="workspace-heading">
+      <div>
+        <p class="workspace-kicker">团队知识空间</p>
+        <h1>文档库</h1>
+        <p class="workspace-description">让资料集中保存，让历史方案与交接记录随时可查。</p>
+      </div>
+      <span class="workspace-scope">
+        <icon-material-symbols:shield-outline-rounded />
+        仅展示你有权访问的文档
+      </span>
+    </header>
+    <NCard title="团队文档" :bordered="false" size="small" class="page-section sm:flex-1-hidden">
       <template #header-extra>
         <TableHeaderOperation v-model:columns="columnChecks" :loading="loading" @add="handleUpload" @refresh="getList">
           <template #prefix>
@@ -593,24 +583,47 @@ async function onBeforeUpload(
               <template #icon>
                 <icon-ic-round-search class="text-icon" />
               </template>
-              检索知识库
+              检索文档
             </NButton>
           </template>
+          <NButton size="small" type="primary" @click="handleUpload">
+            <template #icon><icon-ic-round-plus /></template>
+            上传文档
+          </NButton>
         </TableHeaderOperation>
       </template>
+      <NAlert v-if="documentLoadFailed" type="error" :show-icon="true" class="mb-4" title="文档列表未能加载">
+        请检查网络后重试。若列表中仍有内容，显示的是上次加载的资料。
+        <div class="mt-3"><NButton size="small" :loading="loading" @click="getList">重新加载</NButton></div>
+      </NAlert>
       <NDataTable
         :bordered="false"
         :columns="columns"
         :data="tableTasks"
         size="small"
         :flex-height="!appStore.isMobile"
-        :scroll-x="962"
+        :scroll-x="1180"
         :loading="loading"
         remote
-        :row-key="row => row.id"
+        :row-key="row => row.fileMd5"
         :pagination="mobilePagination"
         class="sm:h-full"
-      />
+      >
+        <template #empty>
+          <div class="document-empty" aria-live="polite">
+            <icon-material-symbols:folder-open-outline-rounded class="text-40px text-primary" />
+            <h3>{{ documentLoadFailed ? '暂时无法获取文档' : '从第一份团队文档开始' }}</h3>
+            <p>
+              {{
+                documentLoadFailed
+                  ? '重新加载列表，或稍后再试。'
+                  : '上传方案、手册或阶段记录，内容处理完成后即可查找和提问。'
+              }}
+            </p>
+            <NButton v-if="!documentLoadFailed" type="primary" secondary @click="handleUpload">上传文档</NButton>
+          </div>
+        </template>
+      </NDataTable>
     </NCard>
     <UploadDialog v-model:visible="uploadVisible" />
     <SearchDialog v-model:visible="searchVisible" />
@@ -630,6 +643,25 @@ async function onBeforeUpload(
 </template>
 
 <style scoped lang="scss">
+.document-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 64px 20px;
+  text-align: center;
+}
+.document-empty h3 {
+  color: var(--app-text);
+  font-size: 17px;
+  font-weight: 600;
+}
+.document-empty p {
+  max-width: 400px;
+  margin-bottom: 8px;
+  color: var(--app-muted);
+  line-height: 1.8;
+}
 .file-list-container {
   transition: width 0.3s ease;
 }

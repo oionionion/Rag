@@ -73,10 +73,10 @@ const sourceFiles = ref<
 >([]);
 const bareUrlPattern = /https?:\/\/[A-Za-z0-9\-._~:/?#\[\]@!$&'()*+,;=%]+/g;
 const toolNameLabels: Record<string, string> = {
-  search_knowledge: '检索知识库',
-  generate_summary: '生成知识摘要',
+  search_knowledge: '查找相关文档',
+  generate_summary: '整理文档摘要',
   submit_feedback: '记录反馈',
-  knowledge_stats: '读取知识库统计'
+  knowledge_stats: '查看文档概况'
 };
 const toolStatusLabels: Record<Api.Chat.AgentToolEvent['status'], string> = {
   executing: '执行中',
@@ -387,7 +387,7 @@ async function handleSourceFileClick(fileInfo: {
         <SystemLogo class="text-6 text-white" />
       </NAvatar>
       <div class="flex-col gap-1">
-        <NText class="text-4 font-bold">派聪明</NText>
+        <NText class="text-4 font-bold">DocPilot</NText>
         <NText class="text-muted text-3">{{ formatDate(msg.timestamp) }}</NText>
       </div>
     </div>
@@ -453,18 +453,18 @@ async function handleSourceFileClick(fileInfo: {
 
 <style scoped lang="scss">
 :deep(.source-file-link) {
-  color: #1890ff;
+  color: rgb(var(--primary-color));
   cursor: pointer;
   text-decoration: underline;
   transition: color 0.2s;
 
   &:hover {
-    color: #40a9ff;
+    color: rgb(var(--primary-400-color));
     text-decoration: none;
   }
 
   &:active {
-    color: #096dd9;
+    color: rgb(var(--primary-600-color));
   }
 }
 

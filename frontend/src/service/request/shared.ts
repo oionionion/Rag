@@ -9,7 +9,8 @@ const backendMessageMap: Record<string, string> = {
   INVITE_CODE_EXPIRED: '邀请码已过期，请重新获取',
   INVITE_CODE_EXHAUSTED: '邀请码已失效，请重新获取',
   REGISTRATION_CLOSED: '当前暂未开放注册',
-  'Username already exists': '用户名已存在'
+  'Username already exists': '用户名已存在',
+  'the backend request error': '服务暂时无法完成请求，请稍后重试。'
 };
 
 export function getAuthorization() {
